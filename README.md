@@ -83,3 +83,7 @@ DELETE FROM employee WHERE id = 2;
 ```bash
 DELETE FROM employee WHERE age < 18;
 ```
+
+## Table
+<img src="https://github.com/user-attachments/assets/4b72d39d-e8e7-4499-b936-1a385e5fcc6c">
+
