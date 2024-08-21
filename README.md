@@ -87,3 +87,90 @@ DELETE FROM employee WHERE age < 18;
 ## Table
 <img src="https://github.com/user-attachments/assets/4b72d39d-e8e7-4499-b936-1a385e5fcc6c">
 
+## Table in App Inspection
+<img src="https://github.com/user-attachments/assets/bfd66ba1-863f-46cf-8996-51b7a941a0c0">
+
+## Database Helper class
+```bash
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+
+class DatabaseHelper {
+  static DatabaseHelper databaseHelper = DatabaseHelper._();
+
+  DatabaseHelper._();
+
+  static const String databaseName = 'notes.db';
+  static const String tableName = 'notes';
+
+  Database? _database;
+
+  Future<Database?> get database async => _database ?? await initDatabase();
+
+  Future<Database?> initDatabase() async {
+    final path = await getDatabasesPath();
+    final dbPath = join(path, databaseName);
+    return await openDatabase(
+      dbPath,
+      version: 1,
+      onCreate: (db, version) {
+        String sql = '''
+      CREATE TABLE $tableName (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      amount INTEGER NOT NULL,
+      description TEXT NOT NULL,
+      category TEXT
+      )
+      ''';
+        db.execute(sql);
+      },
+    );
+  }
+
+  Future<int> insertData() async {
+    final db = await database;
+    String sql = '''
+    INSERT INTO $tableName (amount, description)
+    VALUES (3000, 'Bike Service');
+    ''';
+    final result = await db!.rawInsert(sql);
+    return result;
+  }
+
+  Future<int> deleteData(int id) async {
+    final db = await database;
+    String sql = '''
+    DELETE FROM $tableName WHERE id = $id
+    ''';
+    final result = await db!.rawDelete(sql);
+    return result;
+  }
+}
+```
+
+## Controller
+```bash
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sqlite_practice/helper/database_helper.dart';
+
+class BudgetController extends GetxController{
+
+  @override
+  void onInit(){
+    super.onInit();
+    initDb();
+  }
+
+  Future initDb() async{
+    await DatabaseHelper .databaseHelper.database;
+  }
+
+  Future insertRecord() async{
+    await DatabaseHelper.databaseHelper.insertData();
+  }
+  Future deleteRecord(int id) async{
+    await DatabaseHelper.databaseHelper.deleteData(id);
+  }
+}
+```
